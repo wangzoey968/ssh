@@ -13,7 +13,7 @@
 
     </defaultCache>
 
-    <!-- Special objects settings. -->
+    <!-- Special objects setting. -->
 
     <!--<cache
             name="org.andy.work.entity.AcctUser"
