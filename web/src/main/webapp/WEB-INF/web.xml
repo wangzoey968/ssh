@@ -8,7 +8,7 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:spring.xml,classpath:spring-hibernate.xml</param-value>
+        <param-value>classpath:spring.xml</param-value>
     </context-param>
 
     <filter>
@@ -50,7 +50,7 @@
 
     <servlet>
         <description>spring mvc servlet</description>
-        <servlet-name>rest</servlet-name>
+        <servlet-name>spring</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
@@ -61,14 +61,14 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>rest</servlet-name>
-        <url-pattern>*.htmls</url-pattern>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>*.do</url-pattern>
     </servlet-mapping>
 
-    <filter-mapping>
+    <!--<filter-mapping>
         <filter-name>openSessionInViewFilter</filter-name>
         <url-pattern>*.htmls</url-pattern>
-    </filter-mapping>
+    </filter-mapping>-->
 
     <!-- 配置session超时时间，单位分钟 -->
     <session-config>

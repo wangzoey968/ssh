@@ -49,8 +49,7 @@
                 <prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}</prop>
                 <prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
                 <prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory_class}</prop>
-                <prop key="hibernate.cache.provider_configuration_file_resource_path">${hibernate.cache.provider_configuration_file_resource_path}
-                </prop>
+                <prop key="hibernate.cache.provider_configuration_file_resource_path">${hibernate.cache.provider_configuration_file_resource_path}</prop>
             </props>
         </property>
         <!-- 扫描hibernate注解配置的entity -->
@@ -88,8 +87,7 @@
         <aop:pointcut id="transactionPointcut"
                       expression="execution(* com.it.service..*Impl.*(..))" />
         <!-- 指定在txAdvice切入点应用txAdvice事务增强处理 -->
-        <aop:advisor pointcut-ref="transactionPointcut"
-                     advice-ref="transactionAdvice" />
+        <aop:advisor pointcut-ref="transactionPointcut" advice-ref="transactionAdvice" />
     </aop:config>
 
 </beans>
