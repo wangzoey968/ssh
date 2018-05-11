@@ -1,1 +1,1 @@
-this project was built spring+springmvc+hibernate 
+this project was built by spring+springmvc+hibernate 
