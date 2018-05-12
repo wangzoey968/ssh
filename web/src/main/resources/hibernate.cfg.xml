@@ -4,7 +4,12 @@
 
 <hibernate-configuration>
     <session-factory>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
         <!-- 引入需要映射的类 -->
-        <mapping class="com.it.pojo.Tb_User"/>
+        <!--<mapping class="com.it.pojo.Tb_User"/>-->
+        <!--<mapping package="com.it.pojo"/>-->
     </session-factory>
 </hibernate-configuration>

@@ -13,11 +13,12 @@
 		http://www.springframework.org/schema/context
 		http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!--********************************************配置spring********************************************-->
+    <!--扫描包-->
+    <context:component-scan base-package="com.it.dao"/>
+    <context:component-scan base-package="com.it.service" />
+    <context:component-scan base-package="com.it.controller"/>
 
     <context:property-placeholder location="classpath:jdbc.properties"/>
-    <!-- 扫描service自动注入为bean -->
-    <context:component-scan base-package="com.it.service.*" />
 
     <!--********************************************配置数据源 c3p0********************************************-->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
@@ -40,31 +41,35 @@
         <property name="acquireIncrement" value="5" />
     </bean>
 
-    <!--配置sessionFactory-->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    <!--配置sessionFactory,第一种方式-->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
-        <property name="packagesToScan" value="com.it.pojo" />
+        <property name="annotatedClasses">
+            <list>
+                <value>com.it.pojo.Tb_User</value>
+                <value>com.it.pojo.Tb_Customer</value>
+            </list>
+        </property>
         <property name="hibernateProperties">
             <props>
-                <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop> <!--hibernate根据实体自动生成数据库表-->
-                <prop key="hibernate.dialect">${hibernate.dialect}</prop>   <!--指定数据库方言-->
-                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>     <!--在控制台显示执行的数据库操作语句-->
-                <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>     <!--在控制台显示执行的数据库操作语句（格式）-->
-
-                <!-- 开启二级缓存 ehcache -->
-                <!--<prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}</prop>
-                <prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
-                <prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory_class}</prop>
-                <prop key="hibernate.cache.provider_configuration_file_resource_path">${hibernate.cache.provider_configuration_file_resource_path}</prop>-->
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.connection.charSet">UTF-8</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
             </props>
         </property>
-        <!--如果使用xxx.hbm.xml-->
-        <!--<property name="mappingResources" >
-            <list>
-                <value>com/shin/entities/User.hbm.xml</value>
-            </list>
-        </property>-->
     </bean>
+
+    <!--配置sessionFactory,第二种方式-->
+    <!--建立sessionFactory-->
+    <!--<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocations">
+            <list>
+                <value>classpath:hibernate.cfg.xml</value>
+            </list>
+        </property>
+    </bean>-->
 
     <!--********************************************配置spring事物********************************************-->
 
@@ -92,19 +97,17 @@
             <tx:method name="select*" propagation="SUPPORTS" read-only="true" />
             <tx:method name="load*" propagation="SUPPORTS" read-only="true" />
 
-            <!-- 其他采用默认事务方式 -->
-            <tx:method name="*" />
-
+            <!-- 其他的采用该默认-->
+            <tx:method name="*" propagation="REQUIRED" read-only="true" />
         </tx:attributes>
     </tx:advice>
 
     <!-- Spring aop事务管理 -->
     <aop:config>
         <!-- 配置切入点 -->
-        <aop:pointcut id="transactionPointcut"
-                      expression="execution(* com.it.service..*Impl.*(..))" />
+        <aop:pointcut id="transactionPointcut" expression="execution(* com.it.service.*.*.*(..))" />
         <!-- 指定在txAdvice切入点应用txAdvice事务增强处理 -->
-        <aop:advisor pointcut-ref="transactionPointcut" advice-ref="transactionAdvice" />
+        <aop:advisor advice-ref="transactionAdvice" pointcut-ref="transactionPointcut"/>
     </aop:config>
 
 </beans>
