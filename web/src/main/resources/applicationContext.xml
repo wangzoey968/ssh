@@ -18,11 +18,19 @@
        default-autowire="byName" default-lazy-init="false">
     <!-- 注意上面的default-autowire="byName"，如果没有这个声明那么HibernateDaoSupport中的sessionFactory不会被注入 -->
 
+    <!-- 注解探测器 -->
+    <context:annotation-config />
+    <!--注解扫描包  -->
+    <context:component-scan base-package="com.it.controller"/>
+    <context:component-scan base-package="com.it.service"/>
+    <context:component-scan base-package="com.it.dao"/>
+    <context:component-scan base-package="com.it.pojo"/>
+
     <!-- 定义受环境影响易变的变量 -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath:/jdbc.properties</value>
+                <value>classpath:/hibernate.properties</value>
             </list>
         </property>
     </bean>
@@ -52,13 +60,11 @@
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
 
-        <!--<property name="packagesToScan">
+        <property name="packagesToScan">
             <list>
                 <value>com.it.pojo</value>
             </list>
-        </property>-->
-        <property name="packagesToScan" value="com.it.pojo" />
-
+        </property>
         <property name="hibernateProperties">
             <value>
                 hibernate.dialect=${hibernate.dialect}
