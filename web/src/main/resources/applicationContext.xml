@@ -21,10 +21,9 @@
     <!-- 注解探测器 -->
     <context:annotation-config />
     <!--注解扫描包  -->
-    <context:component-scan base-package="com.it.controller"/>
-    <context:component-scan base-package="com.it.service"/>
     <context:component-scan base-package="com.it.dao"/>
-    <context:component-scan base-package="com.it.pojo"/>
+    <context:component-scan base-package="com.it.service"/>
+    <context:component-scan base-package="com.it.controller"/>
 
     <!-- 定义受环境影响易变的变量 -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
