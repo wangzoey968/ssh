@@ -1,20 +1,10 @@
 package com.it.dao;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Repository;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 /**
- * Created by wangzy on 2018/5/11.
+ * Created by wangzy on 2018/5/14
  */
-public class DaoTest {
+public class DaoTest extends HibernateDaoSupport {
 
-    public void ss() throws Exception {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        SessionFactory sessionFactory = (SessionFactory) context.getBean("sessionFactory");
-        System.out.println(sessionFactory.toString());
-    }
 }

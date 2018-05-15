@@ -4,6 +4,7 @@
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
 		http://www.springframework.org/schema/tx
@@ -11,72 +12,76 @@
 		http://www.springframework.org/schema/aop
 		http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
 		http://www.springframework.org/schema/context
-		http://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd"
+       default-autowire="byName" default-lazy-init="false">
+    <!-- 注意上面的default-autowire="byName"，如果没有这个声明那么HibernateDaoSupport中的sessionFactory不会被注入 -->
 
-    <!--扫描包-->
-    <context:component-scan base-package="com.it.dao"/>
-    <context:component-scan base-package="com.it.service" />
-    <context:component-scan base-package="com.it.controller"/>
-
-    <context:property-placeholder location="classpath:jdbc.properties"/>
-
-    <!--********************************************配置数据源 c3p0********************************************-->
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
-          destroy-method="close">
-        <property name="driverClass" value="${jdbc.driver}" />
-        <property name="jdbcUrl" value="${jdbc.url}" />
-        <property name="user" value="${jdbc.username}" />
-        <property name="password" value="${jdbc.password}" />
-        <!-- 请求超时时间 -->
-        <property name="checkoutTimeout" value="30000" />
-        <!-- 每60秒检查所有连接池中的空闲连接。默认值: 0，不检查 -->
-        <property name="idleConnectionTestPeriod" value="30" />
-        <!-- 连接数据库连接池最大空闲时间 -->
-        <property name="maxIdleTime" value="30" />
-        <!-- 连接池初始化连接数 -->
-        <property name="initialPoolSize" value="5" />
-        <property name="minPoolSize" value="5" />
-        <property name="maxPoolSize" value="20" />
-        <!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。默认值: 3 -->
-        <property name="acquireIncrement" value="5" />
-    </bean>
-
-    <!--配置sessionFactory,第一种方式-->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
-        <property name="dataSource" ref="dataSource" />
-        <property name="annotatedClasses">
+    <!-- 定义受环境影响易变的变量 -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
             <list>
-                <value>com.it.pojo.Tb_User</value>
-                <value>com.it.pojo.Tb_Customer</value>
+                <value>classpath:/jdbc.properties</value>
             </list>
         </property>
-        <property name="hibernateProperties">
-            <props>
-                <prop key="hibernate.show_sql">true</prop>
-                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
-                <prop key="hibernate.connection.charSet">UTF-8</prop>
-                <prop key="hibernate.hbm2ddl.auto">update</prop>
-            </props>
-        </property>
     </bean>
 
-    <!--配置sessionFactory,第二种方式-->
-    <!--建立sessionFactory-->
-    <!--<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    <!-- 约定优于配置，约定优于配置 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+        <property name="maxActive" value="200"/>
+        <property name="initialSize" value="10"/>
+        <property name="maxWait" value="60000"/>
+        <property name="minIdle" value="10"/>
+
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+
+        <property name="filters" value="stat"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+    </bean>
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-        <property name="configLocations">
+
+        <!--<property name="packagesToScan">
             <list>
-                <value>classpath:hibernate.cfg.xml</value>
+                <value>com.it.pojo</value>
             </list>
+        </property>-->
+        <property name="packagesToScan" value="com.it.pojo" />
+
+        <property name="hibernateProperties">
+            <value>
+                hibernate.dialect=${hibernate.dialect}
+                hibernate.connection.driver_class=${jdbc.driver}
+                hibernate.connection.url=${jdbc.url}
+                hibernate.connection.username=${jdbc.username}
+                hibernate.connection.password=${jdbc.password}
+                hibernate.hbm2ddl.auto=${hibernate.hbm2ddl}
+                hibernate.show_sql=${hibernate.showsql}
+                hibernate.format_sql=${hibernate.formatsql}
+                hibernate.cache.use_second_level_cache=${hibernate.secondlevelcache}
+                hibernate.cache.use_query_cache=${hibernate.querycache}
+                hibernate.cache.region.factory_class=${hibernate.classcache}
+            </value>
         </property>
-    </bean>-->
+    </bean>
 
     <!--********************************************配置spring事物********************************************-->
 
     <!-- 配置事务管理器 -->
     <bean id="transactionManager"
           class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-        <property name="sessionFactory" ref="sessionFactory" />
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
     <!--事物配置,2选1即可-->
@@ -88,26 +93,35 @@
     <tx:advice id="transactionAdvice" transaction-manager="transactionManager">
         <!-- 配置详细事务处理语义 -->
         <tx:attributes>
-            <tx:method name="insert*" propagation="REQUIRED" />
-            <tx:method name="update*" propagation="REQUIRED" />
-            <tx:method name="delete*" propagation="REQUIRED" />
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
 
-            <tx:method name="get*" propagation="SUPPORTS" read-only="true" />
-            <tx:method name="find*" propagation="SUPPORTS" read-only="true" />
-            <tx:method name="select*" propagation="SUPPORTS" read-only="true" />
-            <tx:method name="load*" propagation="SUPPORTS" read-only="true" />
+            <tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="select*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="load*" propagation="SUPPORTS" read-only="true"/>
 
             <!-- 其他的采用该默认-->
-            <tx:method name="*" propagation="REQUIRED" read-only="true" />
+            <tx:method name="*" propagation="REQUIRED" read-only="true"/>
         </tx:attributes>
     </tx:advice>
 
     <!-- Spring aop事务管理 -->
     <aop:config>
         <!-- 配置切入点 -->
-        <aop:pointcut id="transactionPointcut" expression="execution(* com.it.service.*.*.*(..))" />
+        <aop:pointcut id="transactionPointcut" expression="execution(* com.it.service.*.*.*(..))"/>
         <!-- 指定在txAdvice切入点应用txAdvice事务增强处理 -->
         <aop:advisor advice-ref="transactionAdvice" pointcut-ref="transactionPointcut"/>
     </aop:config>
+
+    <!-- 扫描组件 -->
+    <context:component-scan base-package="com.it"/>
+
+    <!-- 使用默认的Servlet来响应静态文件  -->
+    <mvc:default-servlet-handler/>
+
+    <!-- 开启AOP切面注解  -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
 
 </beans>
