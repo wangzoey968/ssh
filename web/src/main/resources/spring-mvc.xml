@@ -11,7 +11,7 @@
 
     <!-- 开启springmvc注解，定义只扫描@Cotroller  -->
     <mvc:annotation-driven/>
-    <context:component-scan base-package="com.it.controller" use-default-filters="false">
+    <context:component-scan base-package="com.it.controller.*" use-default-filters="false">
         <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
 
