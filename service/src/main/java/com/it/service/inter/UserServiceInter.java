@@ -7,6 +7,6 @@ import com.it.pojo.Tb_User;
  */
 public interface UserServiceInter {
 
-    public Tb_User selectUser();
+    Tb_User selectUser();
 
 }
