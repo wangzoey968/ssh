@@ -114,6 +114,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!--引入gson-->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>

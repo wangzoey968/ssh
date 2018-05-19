@@ -52,7 +52,7 @@
         </property>
     </bean>
 
-    <!--配置BaseDao中的sessionFactory,注入-->
+    <!--注入BaseDao中的sessionFactory-->
     <!--<bean id="hibernate" class="com.zhundian.util.BaseDao">
         <constructor-arg ref="sessionFactory"/>
     </bean>-->
