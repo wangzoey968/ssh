@@ -128,7 +128,7 @@
             <version>${spring.version}</version>
         </dependency>
 
-        <!-- hibernate -->
+        <!-- hibernate配置 -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
